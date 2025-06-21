@@ -1,0 +1,150 @@
+/*
+ * frontend/assets/css/components/sidebar.css
+ * Descrição: Estilos para a barra lateral e seus componentes (botões).
+ */
+
+/* ==========================================================================
+    BARRA LATERAL
+    ========================================================================== */
+
+/* Estilos para a barra lateral */
+.sidebar {
+    position: fixed; /* Fixa a barra lateral na tela, mesmo durante a rolagem */
+    top: 0; /* Alinha a barra ao topo da viewport */
+    left: 0; /* Alinha a barra à esquerda da viewport */
+    width: 72px; /* Largura inicial da barra lateral (recolhida) */
+    height: 100vh; /* Define a altura da barra lateral para 100% da viewport */
+    background-color: #282A2C; /* Define a cor de fundo da barra lateral */
+    box-shadow: 5px 0 15px rgba(0, 0, 0, 0.05); /* Adiciona uma leve sombra à direita para separação visual */
+    transition: width 0.3s ease 0.1s; /* Adiciona uma transição suave para a propriedade 'width' com um pequeno atraso inicial */
+    z-index: 100; /* Garante que a barra lateral fique acima de outros elementos, se necessário */
+}
+
+/* Estilos para a barra lateral quando a classe 'expanded' é adicionada (via JavaScript) */
+.sidebar.expanded {
+    width: 272px; /* Define a nova largura da barra lateral quando expandida */
+    transition: width 0.3s ease 0s; /* Transição suave para a largura, sem atraso quando expandida */
+}
+
+/* Estilos para a barra lateral em hover, expandindo se não tiver a classe 'no-hover' e o mouse não estiver no menu */
+.sidebar:hover:not(.no-hover):not(:has(.menu-toggle:hover)) {
+    width: 272px;
+}
+
+/* ==========================================================================
+    BOTÕES DA BARRA LATERAL (MENU, INÍCIO, IMPORTAR CSV, FUNCIONÁRIOS)
+    ========================================================================== */
+
+/* Estilos para os botões da barra lateral (compartilhados) */
+.sidebar .menu-toggle {
+    position: fixed; /* Fixa o botão dentro da barra lateral */
+    top: var(--top);
+    bottom: var(--bot);
+    left: 16px; /* Centraliza horizontalmente o botão em relação à largura da barra lateral recolhida */
+    /* transform: translateX(-50%); Ajusta o posicionamento para centralizar corretamente */
+
+    width: 40px; /* Define a largura do botão */
+    height: 40px; /* Define a altura do botão */
+
+    display: flex; /* Usa Flexbox para centralizar o ícone dentro do botão */
+    justify-content: center; /* Centraliza horizontalmente */
+    align-items: center; /* Centraliza verticalmente */
+
+    cursor: pointer; /* Altera o cursor para indicar que é clicável */
+    border-radius: 50%; /* Torna o botão circular */
+
+    color: #BFBFBF; /* Cor padrão do ícone e do texto */
+    font-size: 15px; /* Tamanho padrão do ícone e do texto */
+
+    transition: background-color 0.3s ease; /* Adiciona uma transição suave para a cor de fundo no hover */
+    z-index: 1000; /* Garante que o botão fique acima de outros elementos */
+}
+
+/* Estilos para os botões da barra lateral (compartilhados) */
+.sidebar .home-button,
+.sidebar .import-csv,
+.sidebar .employees-button {
+    position: fixed; /* Fixa o botão dentro da barra lateral */
+    top: var(--top);
+    bottom: var(--bot);
+    left: 16px; /* Centraliza horizontalmente o botão em relação à largura da barra lateral recolhida */
+    /* transform: translateX(-50%); Ajusta o posicionamento para centralizar corretamente */
+
+    width: 40px; /* Define a largura do botão */
+    height: 40px; /* Define a altura do botão */
+
+    display: flex; /* Usa Flexbox para centralizar o ícone dentro do botão */
+    justify-content: flex-start; /* Alinha à esquerda horizontalmente */
+    align-items: center; /* Centraliza verticalmente */
+
+    cursor: pointer; /* Altera o cursor para indicar que é clicável */
+    border: none; /* Sem borda */
+    border-radius: 20px; /* Torna o botão em formato de pílula */
+
+    background: none;
+    color: #BFBFBF; /* Cor padrão do ícone e do texto */
+    font-size: 15px; /* Tamanho padrão do ícone e do texto */
+    padding: 0 12px; /* Espaçamento interno para desgrudar o ícone da esquerda */
+
+    gap: 10px; /* Gap entre o ícone e a label */
+    transition: all 0.3s ease 0.1s; /* Adiciona uma transição suave para todos os aspectos */ 
+    white-space: nowrap; /* Label sem quebra de linha */
+    overflow: hidden;
+
+    z-index: 1000; /* Garante que o botão fique acima de outros elementos */
+}
+
+/* Estilos para os ícones dentro dos botões da barra lateral */
+.sidebar .menu-toggle i,
+.sidebar .home-button i,
+.sidebar .import-csv i,
+.sidebar .employees-button i {
+    /* color: #BFBFBF; Define a cor do ícone para um cinza claro */
+    /* font-size: 15px; Define o tamanho do ícone */
+    pointer-events: none; /* Permite que os cliques passem diretamente para o botão */
+}
+
+.sidebar .home-button .label,
+.sidebar .import-csv .label,
+.sidebar .employees-button .label {
+    opacity: 0;
+    transition: opacity 0.2s ease 0.1s;
+    pointer-events: none;
+}
+
+/* Para não exibir as labels quando o mouse passa diretamente no menu-toggle */
+.sidebar .menu-toggle:hover ~ .home-button .label,
+.sidebar .menu-toggle:hover ~ .import-csv .label,
+.sidebar .menu-toggle:hover ~ .employees-button .label {
+    opacity: 0; /* Garante que as labels não apareçam ao passar o mouse sobre o menu-toggle */
+}
+
+.sidebar:hover .home-button,
+.sidebar.expanded .home-button,
+.sidebar:hover .import-csv,
+.sidebar.expanded .import-csv,
+.sidebar:hover .employees-button,
+.sidebar.expanded .employees-button {
+    width: 215px;
+}
+
+.sidebar:hover .home-button .label,
+.sidebar:hover .import-csv .label,
+.sidebar:hover .employees-button .label {
+    opacity: 1;
+}
+
+/* Quando a barra lateral está expandida (com a classe .expanded), as labels devem ser visíveis */
+.sidebar.expanded .home-button .label,
+.sidebar.expanded .import-csv .label,
+.sidebar.expanded .employees-button .label {
+    opacity: 1 !important; /* Força a visibilidade das labels */
+}
+
+/* Efeito de hover nos botões da barra lateral */
+.sidebar .menu-toggle:hover,
+.sidebar .home-button:hover,
+.sidebar .import-csv:hover,
+.sidebar .employees-button:hover {
+    background-color: rgba(255, 255, 255, 0.1); /* Aplica um fundo levemente transparente ao passar o mouse */
+}

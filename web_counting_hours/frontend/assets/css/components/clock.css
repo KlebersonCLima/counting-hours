@@ -1,0 +1,116 @@
+/*
+ * frontend/assets/css/components/clock.css
+ * Descrição: Estilos para o relógio analógico.
+ */
+
+/* ==========================================================================
+    RELÓGIO
+    ========================================================================== */
+
+/* Estilos para o container que centraliza o relógio */
+.clock-container {
+    display: flex; /* Usa Flexbox para centralizar o relógio */
+    justify-content: center; /* Centraliza horizontalmente */
+    align-items: center; /* Centraliza verticalmente */
+    margin-bottom: 30px; /* Adiciona um espaçamento abaixo do relógio */
+}
+
+/* Estilos para o relógio analógico */
+.clock {
+    height: 350px; /* Define a altura do relógio */
+    width: 350px; /* Define a largura do relógio */
+    display: flex; /* Usa Flexbox para posicionar os ponteiros */
+    justify-content: center; /* Centraliza os ponteiros horizontalmente */
+    align-items: center; /* Centraliza os ponteiros verticalmente */
+    background-image: url('../../images/clock.png'); /* Define a imagem de fundo do relógio */
+    background-size: cover; /* Garante que a imagem cubra todo o container do relógio */
+    border: 4px solid #1B1C1E; /* Adiciona uma borda ao redor do relógio */
+    box-shadow:
+        0 -15px 15px rgba(255, 255, 255, 0.05), /* Sombra superior externa */
+        inset 0 -15px 15px rgba(255, 255, 255, 0.05), /* Sombra superior interna */
+        0 15px 15px rgba(0, 0, 0, 0.3), /* Sombra inferior externa */
+        inset 0 15px 15px rgba(0, 0, 0, 0.3); /* Sombra inferior interna */
+    border-radius: 50%; /* Torna o container do relógio circular */
+}
+
+/* Estilo para o ponto central do relógio */
+.clock::before {
+    content: ''; /* Necessário para elementos pseudo */
+    position: absolute; /* Posiciona o ponto central relativamente ao relógio */
+    height: 15px; /* Define a altura do ponto central */
+    width: 15px; /* Define a largura do ponto central */
+    background-color: #777777; /* Define a cor do ponto central */
+    border-radius: 50%; /* Torna o ponto central circular */
+    z-index: 10000; /* Garante que o ponto central fique acima dos ponteiros */
+}
+
+/* Estilos para os containers dos ponteiros */
+.clock .hour,
+.clock .min,
+.clock .sec {
+    position: absolute; /* Permite posicionar os ponteiros sobre o centro do relógio */
+}
+
+/* Estilos para o container do ponteiro das horas e o próprio ponteiro */
+.clock .hour,
+#hr {
+    width: 160px; /* Define o tamanho do container do ponteiro das horas */
+    height: 160px; /* Define o tamanho do container do ponteiro das horas */
+}
+
+/* Estilos para o container do ponteiro dos minutos e o próprio ponteiro */
+.clock .min,
+#mn {
+    width: 190px; /* Define o tamanho do container do ponteiro dos minutos */
+    height: 190px; /* Define o tamanho do container do ponteiro dos minutos */
+}
+
+/* Estilos para o container do ponteiro dos segundos e o próprio ponteiro */
+.clock .sec,
+#sc {
+    width: 230px; /* Define o tamanho do container do ponteiro dos segundos */
+    height: 230px; /* Define o tamanho do container do ponteiro dos segundos */
+}
+
+/* Estilos para os elementos que representam visualmente os ponteiros */
+.hr,
+.mn,
+#sc {
+    display: flex; /* Usa Flexbox para posicionar a parte visual do ponteiro */
+    justify-content: center; /* Alinha a parte visual do ponteiro ao centro do seu container */
+    position: absolute; /* Permite que os ponteiros sejam rotacionados a partir do centro */
+    border-radius: 50%; /* Mantém o formato circular (embora a parte visível seja retangular) */
+}
+
+/* Estilo para a parte visual do ponteiro das horas */
+#hr::before {
+    content: ''; /* Necessário para elementos pseudo */
+    position: absolute; /* Posiciona a parte visual dentro do seu container */
+    width: 8px; /* Define a largura do ponteiro das horas */
+    height: 80px; /* Define o comprimento do ponteiro das horas */
+    background: linear-gradient(to bottom, #ff8c00, #ff0080); /* Aplica um gradiente vertical ao ponteiro */
+    z-index: 10; /* Garante que o ponteiro fique acima de outros elementos do relógio */
+    border-radius: 40%; /* Arredonda as bordas do ponteiro */
+}
+
+/* Estilo para a parte visual do ponteiro dos minutos */
+#mn::before {
+    content: ''; /* Necessário para elementos pseudo */
+    position: absolute; /* Posiciona a parte visual dentro do seu container */
+    width: 4px; /* Define a largura do ponteiro dos minutos */
+    height: 90px; /* Define o comprimento do ponteiro dos minutos */
+    background-color: #777777; /* Define a cor do ponteiro dos minutos */
+    z-index: 11; /* Garante que o ponteiro fique acima do ponteiro das horas */
+    border-radius: 40%; /* Arredonda as bordas do ponteiro */
+}
+
+/* Estilo para a parte visual do ponteiro dos segundos */
+#sc::before {
+    content: ''; /* Necessário para elementos pseudo */
+    position: absolute; /* Posiciona a parte visual dentro do seu container */
+    width: 2px; /* Define a largura do ponteiro dos segundos */
+    height: 150px; /* Define o comprimento do ponteiro dos segundos */
+    background-color: #777777; /* Define a cor do ponteiro dos segundos */
+    z-index: 12; /* Garante que o ponteiro fique acima dos outros ponteiros */
+    border-radius: 40%; /* Arredonda as bordas do ponteiro */
+}

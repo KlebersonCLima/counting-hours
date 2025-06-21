@@ -1,0 +1,9 @@
+/* frontend/assets/css/style.css */
+
+@import 'base.css';
+@import 'layout.css';
+@import 'components/sidebar.css';
+@import 'components/clock.css';
+@import 'components/employees-table.css';
+@import 'components/modal.css';
+/* Adicione aqui quaisquer estilos globais adicionais que não se encaixam nos outros arquivos */

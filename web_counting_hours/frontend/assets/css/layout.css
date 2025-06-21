@@ -1,0 +1,47 @@
+/*
+ * frontend/assets/css/layout.css
+ * Descrição: Estilos para o layout principal da página (main-content) e elementos relacionados.
+ */
+
+/* ==========================================================================
+    CONTEÚDO PRINCIPAL
+    ========================================================================== */
+
+/* Estilos para o container do conteúdo principal */
+.main-content {
+    margin-left: 72px; /* Define a margem esquerda para evitar a sobreposição com a barra lateral recolhida */
+    width: calc(100vw - 72px); /* Define a largura do conteúdo principal para ocupar a largura da viewport menos a largura da barra lateral recolhida */
+    height: 100vh; /* Define a altura do conteúdo principal para 100% da viewport */
+
+    /* Centraliza o conteúdo vertical e horizontalmente usando Flexbox */
+    display: flex;
+    flex-direction: column; /* Organiza os itens em coluna (título abaixo do relógio) */
+    align-items: center; /* Centraliza os itens horizontalmente */
+    justify-content: center; /* Centraliza os itens verticalmente */
+
+    /* Adiciona transições suaves para as propriedades 'margin-left' e 'width' */
+    transition: margin-left 0.3s ease, width 0.3s ease;
+}
+
+/* Estilos para o container do conteúdo principal quando a barra lateral está expandida */
+.sidebar.expanded ~ .main-content {
+    margin-left: 272px; /* Aumenta a margem esquerda para corresponder à largura da barra lateral expandida */
+    width: calc(100vw - 272px); /* Diminui a largura do conteúdo principal para não ultrapassar a barra lateral expandida */
+}
+
+/* ==========================================================================
+    TÍTULO PRINCIPAL
+    ========================================================================== */
+
+/* Estilos para o título principal da página */
+.title {
+    font-size: 2rem; /* Define o tamanho da fonte do título (2 vezes o tamanho padrão) */
+    text-align: center; /* Centraliza o texto do título horizontalmente */
+    margin-top: 20px; /* Adiciona um espaçamento acima do título */
+
+    /* Aplica um gradiente linear horizontal ao texto */
+    background: linear-gradient(to right, #ff8c00, #ff0080); /* Define as cores do gradiente (laranja para rosa) */
+    -webkit-background-clip: text; /* Recorta o fundo para o formato do texto (para navegadores WebKit) */
+    background-clip: text; /* Recorta o fundo para o formato do texto (padrão CSS) */
+    color: transparent; /* Torna a cor do texto transparente para que o gradiente do fundo seja visível */
+}

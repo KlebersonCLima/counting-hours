@@ -1,5 +1,40 @@
-venv/
+# Python-specific ignores
 __pycache__/
 *.pyc
-uploads/
-.env
+*.pyd
+.python-version
+env/
+venv/
+ENV/
+.venv/
+Lib/
+site-packages/
+build/
+dist/
+sdist/
+*.egg-info
+.tox/
+.coverage
+
+# macOS specific
+.DS_Store
+
+# Windows specific
+Thumbs.db
+
+# Frontend-specific ignores
+web_counting_hours/frontend/uploads/  # Ignorar a pasta de uploads do frontend
+
+# Backend-specific ignores
+web_counting_hours/backend/uploads/  # Ignorar a pasta de uploads do backend
+web_counting_hours/backend/data/
+web_counting_hours/backend/__pycache__/ # Já listado acima, mas para reforçar
+
+# IDE specific
+.idea/
+.vscode/
+
+# General ignores
+*.log
+*.swp
+*.swo

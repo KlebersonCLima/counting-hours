@@ -1,0 +1,69 @@
+/*
+ * frontend/assets/css/components/employees-table.css
+ * Descrição: Estilos para a tabela de funcionários.
+ */
+
+/* ==========================================================================
+    TABELA DE FUNCIONÁRIOS
+    ========================================================================== */
+
+#employees-table-container {
+    width: 90%; /* Define a largura do container para 90% do main-content */
+    margin-top: 20px; /* Adiciona um espaçamento acima do container da tabela */
+    display: flex; /* Usamos flex para alinhar o conteúdo, mas pode não ser estritamente necessário para a largura */
+    justify-content: center; /* Centraliza a tabela dentro do container (opcional) */
+}
+
+.employees-table {
+    width: 100%; /* Ocupa 90% da largura do main-content */
+    border-collapse: collapse; /* Colapsa as bordas das células para uma borda única */
+    color: #BFBFBF; /* Cor do texto da tabela */
+    background-color: #282A2C; /* Cor de fundo da tabela */
+    border-radius: 8px; /* Bordas arredondadas para a tabela */
+    overflow: hidden; /* Esconde qualquer conteúdo que ultrapasse as bordas arredondadas */
+}
+
+.employees-table th,
+.employees-table td {
+    padding: 12px 15px; /* Espaçamento interno nas células */
+    text-align: left; /* Alinha o texto à esquerda por padrão */
+    border-bottom: 1px solid #3E4042; /* Linha divisória entre as linhas */
+}
+
+.employees-table th {
+    background-color: #3E4042; /* Cor de fundo do cabeçalho */
+    font-weight: bold; /* Texto do cabeçalho em negrito */
+}
+
+.employees-table tbody tr:hover {
+    background-color: rgba(255, 255, 255, 0.05); /* Efeito de hover nas linhas do corpo */
+    cursor: pointer; /* Indica que a linha é interativa (opcional) */
+}
+
+.employees-table td:nth-child(2) { /* Estilo para a coluna "Foto Perfil" */
+    /* Podemos adicionar estilos específicos aqui se decidirmos exibir imagens */
+}
+
+.employees-table td:nth-child(5) { /* Estilo para a coluna "Carga Horária (minutos)" */
+    text-align: center; /* Centraliza a carga horária (opcional) */
+}
+
+.employees-table .delete-button,
+.employees-table .edit-button {
+    background: none;
+    color: #BFBFBF;
+    border: none;
+    margin-right: 10px;
+    cursor: pointer;
+    font-size: 15px;
+    outline: none;
+}
+
+.employees-table .delete-button .fa-trash-alt:hover,
+.employees-table .edit-button .fa-pencil-alt:hover {
+    /* Aplica um gradiente linear horizontal ao texto */
+    background: linear-gradient(to right, #ff8c00, #ff0080); /* Define as cores do gradiente (laranja para rosa) */
+    -webkit-background-clip: text; /* Recorta o fundo para o formato do texto (para navegadores WebKit) */
+    background-clip: text; /* Recorta o fundo para o formato do texto (padrão CSS) */
+    color: transparent; /* Torna a cor do texto transparente para que o gradiente do fundo seja visível */
+}
