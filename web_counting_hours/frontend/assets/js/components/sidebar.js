@@ -4,15 +4,6 @@
  */
 
 // ==========================================================================
-// SELEÇÃO DE ELEMENTOS DO DOM (Relacionados à Barra Lateral)
-// ==========================================================================
-const toggle = document.querySelector('.menu-toggle'); // Botão de alternar menu
-const sidebar = document.querySelector('.sidebar'); // Elemento da barra lateral
-
-// Variável para controlar o timeout do hover da barra lateral
-let hoverTimeout;
-
-// ==========================================================================
 // LÓGICA DA BARRA LATERAL
 // ==========================================================================
 

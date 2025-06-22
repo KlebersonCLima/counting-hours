@@ -9,37 +9,57 @@
 
 /* Estilos para o botão Adicionar Funcionário */
 #add-employee-button {
-    display: none; /* Inicialmente oculto */
-    position: absolute; /* Para posicionar relativamente ao main-content */
-    bottom: 20px; /* Distância da parte inferior */
-    right: 20px; /* Distância da parte direita */
-    padding: 10px 20px; /* Espaçamento interno */
-    background-color: #1B1C1E; /* Cor do fundo da página */
-    color: #BFBFBF; /* Cor do texto para um cinza claro */
+    display: none;
+    /* Inicialmente oculto */
+    position: absolute;
+    /* Para posicionar relativamente ao main-content */
+    bottom: 20px;
+    /* Distância da parte inferior */
+    right: 20px;
+    /* Distância da parte direita */
+    padding: 10px 20px;
+    /* Espaçamento interno */
+    background-color: #1B1C1E;
+    /* Cor do fundo da página */
+    color: #BFBFBF;
+    /* Cor do texto para um cinza claro */
     /* border: 2px solid #3E4042; Adiciona uma borda sutil para separação */
     border: none;
-    border-radius: 20px; /* Formato de pílula (metade da altura + um pouco mais) */
-    cursor: pointer; /* Indica que é clicável */
-    font-size: 1rem; /* Tamanho da fonte */
-    transition: background-color 0.3s ease, box-shadow 0.3s ease; /* Transições suaves */
-    z-index: 10; /* Garante que fique acima de outros elementos */
-    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3); /* Adiciona uma sombra para o efeito flutuante */
-    overflow: hidden; /* Importante para que a borda animada não vaze */
+    border-radius: 20px;
+    /* Formato de pílula (metade da altura + um pouco mais) */
+    cursor: pointer;
+    /* Indica que é clicável */
+    font-size: 1rem;
+    /* Tamanho da fonte */
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    /* Transições suaves */
+    z-index: 10;
+    /* Garante que fique acima de outros elementos */
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
+    /* Adiciona uma sombra para o efeito flutuante */
+    overflow: hidden;
+    /* Importante para que a borda animada não vaze */
 }
 
 #add-employee-button:hover {
-    background:linear-gradient(to right, #ff8c00, #ff0080); /* Cor de fundo gradiente no hover */
-    color: white; /* Cor do texto branco no hover (melhor contraste com o gradiente) */
-    box-shadow: 3px 3px 15px rgba(0, 0, 0, 0.5); /* Sombra mais intensa no hover */
+    background: linear-gradient(to right, #ff8c00, #ff0080);
+    /* Cor de fundo gradiente no hover */
+    color: white;
+    /* Cor do texto branco no hover (melhor contraste com o gradiente) */
+    box-shadow: 3px 3px 15px rgba(0, 0, 0, 0.5);
+    /* Sombra mais intensa no hover */
 }
 
 #add-employee-button i {
-    margin-right: 8px; /* Espaço entre o ícone e o texto */
-    color: #BFBFBF; /* Define a cor do ícone para um cinza claro */
+    margin-right: 8px;
+    /* Espaço entre o ícone e o texto */
+    color: #BFBFBF;
+    /* Define a cor do ícone para um cinza claro */
 }
 
 #add-employee-button:hover i {
-    color: white; /* Cor do ícone branco no hover */
+    color: white;
+    /* Cor do ícone branco no hover */
 }
 
 /* ==========================================================================
@@ -54,7 +74,8 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5); /* Fundo escuro semi-transparente */
+    background-color: rgba(0, 0, 0, 0.5);
+    /* Fundo escuro semi-transparente */
 }
 
 /* Quando o modal estiver ativo */
@@ -68,14 +89,15 @@
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%); /* Esta é a chave para centralizar */
+    transform: translate(-50%, -50%);
+    /* Esta é a chave para centralizar */
     padding: 20px;
     width: 40%;
     max-height: 90vh;
     overflow-y: auto;
     border-radius: 8px;
     color: #BFBFBF;
-    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 
 /* Organização dos campos */
@@ -112,7 +134,8 @@
 }
 
 /* Estilização dos inputs - mantendo o estilo original */
-input[type="text"], input[type="file"] {
+input[type="text"],
+input[type="file"] {
     padding: 8px;
     border: 1px solid #BFBFBF;
     border-radius: 4px;
@@ -120,7 +143,8 @@ input[type="text"], input[type="file"] {
     color: #BFBFBF;
 }
 
-input[type="text"]:focus, input[type="file"]:focus {
+input[type="text"]:focus,
+input[type="file"]:focus {
     outline: none;
     border-color: #007ACC;
     box-shadow: 0 0 5px rgba(0, 122, 204, 0.3);
@@ -201,15 +225,20 @@ button[type="submit"]:hover {
 .close-button:hover,
 .close-button:focus {
     /* Aplica um gradiente linear horizontal ao texto */
-    background: linear-gradient(to right, #ff8c00, #ff0080); /* Define as cores do gradiente (laranja para rosa) */
-    -webkit-background-clip: text; /* Recorta o fundo para o formato do texto (para navegadores WebKit) */
-    background-clip: text; /* Recorta o fundo para o formato do texto (padrão CSS) */
-    color: transparent; /* Torna a cor do texto transparente para que o gradiente do fundo seja visível */
+    background: linear-gradient(to right, #ff8c00, #ff0080);
+    /* Define as cores do gradiente (laranja para rosa) */
+    -webkit-background-clip: text;
+    /* Recorta o fundo para o formato do texto (para navegadores WebKit) */
+    background-clip: text;
+    /* Recorta o fundo para o formato do texto (padrão CSS) */
+    color: transparent;
+    /* Torna a cor do texto transparente para que o gradiente do fundo seja visível */
     text-decoration: none;
 }
 
 #add-employee-form label {
-    display: block; /* Faz com que cada label ocupe uma linha inteira */
+    display: block;
+    /* Faz com que cada label ocupe uma linha inteira */
     margin-bottom: 5px;
     font-weight: bold;
 }
@@ -221,7 +250,8 @@ button[type="submit"]:hover {
     display: inline-block;
     border: 1px solid #ccc;
     border-radius: 4px;
-    box-sizing: border-box; /* Garante que o padding e a borda não aumentem a largura total */
+    box-sizing: border-box;
+    /* Garante que o padding e a borda não aumentem a largura total */
 }
 
 #add-employee-form button[type=submit],
@@ -290,12 +320,13 @@ button[type="submit"]:hover {
     left: 50%;
     transform: translate(-50%, -50%);
     padding: 20px;
-    width: 45%; /* Ligeiramente maior para acomodar mais campos */
+    width: 45%;
+    /* Ligeiramente maior para acomodar mais campos */
     max-height: 90vh;
     overflow-y: auto;
     border-radius: 8px;
     color: #BFBFBF;
-    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 
 /* Organização dos campos - reutilizando as classes do modal anterior */
@@ -363,7 +394,8 @@ button[type="submit"]:hover {
 /* Select específico */
 .modal-content-CSV select {
     cursor: pointer;
-    width: 100%; /* já está assim, mantém para ocupar todo o espaço do container */
+    width: 100%;
+    /* já está assim, mantém para ocupar todo o espaço do container */
     padding: 8px;
     border: 1px solid #BFBFBF;
     border-radius: 4px;
@@ -422,4 +454,41 @@ button[type="submit"]:hover {
 
 .modal-content-CSV .close-button:hover {
     color: #007ACC;
+}
+
+/* Estilos para o container da foto de perfil */
+.profile-pic-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.current-profile-pic {
+    text-align: center;
+    padding: 10px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+}
+
+.current-profile-pic img {
+    display: block;
+    margin: 0 auto;
+}
+
+/* Estilos para o input de arquivo */
+.profile-pic-container input[type="file"] {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #fff;
+}
+
+.profile-pic-container p {
+    margin: 0;
+    font-size: 12px;
+    color: #666;
+    text-align: center;
 }

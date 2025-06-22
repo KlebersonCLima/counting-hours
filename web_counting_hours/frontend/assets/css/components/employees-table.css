@@ -8,44 +8,135 @@
     ========================================================================== */
 
 #employees-table-container {
-    width: 90%; /* Define a largura do container para 90% do main-content */
-    margin-top: 20px; /* Adiciona um espaçamento acima do container da tabela */
-    display: flex; /* Usamos flex para alinhar o conteúdo, mas pode não ser estritamente necessário para a largura */
-    justify-content: center; /* Centraliza a tabela dentro do container (opcional) */
+    width: 90%;
+    /* Define a largura do container para 90% do main-content */
+    margin-top: 20px;
+    /* Adiciona um espaçamento acima do container da tabela */
+    display: flex;
+    /* Usamos flex para alinhar o conteúdo, mas pode não ser estritamente necessário para a largura */
+    justify-content: center;
+    /* Centraliza a tabela dentro do container (opcional) */
 }
 
 .employees-table {
-    width: 100%; /* Ocupa 90% da largura do main-content */
-    border-collapse: collapse; /* Colapsa as bordas das células para uma borda única */
-    color: #BFBFBF; /* Cor do texto da tabela */
-    background-color: #282A2C; /* Cor de fundo da tabela */
-    border-radius: 8px; /* Bordas arredondadas para a tabela */
-    overflow: hidden; /* Esconde qualquer conteúdo que ultrapasse as bordas arredondadas */
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    background-color: rgba(27, 28, 30, 0.8);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-.employees-table th,
-.employees-table td {
-    padding: 12px 15px; /* Espaçamento interno nas células */
-    text-align: left; /* Alinha o texto à esquerda por padrão */
-    border-bottom: 1px solid #3E4042; /* Linha divisória entre as linhas */
+/* Cabeçalho da tabela */
+.employees-table thead {
+    background-color: #007ACC;
+    color: white;
 }
 
 .employees-table th {
-    background-color: #3E4042; /* Cor de fundo do cabeçalho */
-    font-weight: bold; /* Texto do cabeçalho em negrito */
+    padding: 15px 10px;
+    text-align: left;
+    font-weight: 600;
+    border-bottom: 2px solid #005a8b;
+}
+
+/* Corpo da tabela */
+.employees-table tbody tr {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    transition: background-color 0.3s ease;
 }
 
 .employees-table tbody tr:hover {
-    background-color: rgba(255, 255, 255, 0.05); /* Efeito de hover nas linhas do corpo */
-    cursor: pointer; /* Indica que a linha é interativa (opcional) */
+    background-color: rgba(0, 122, 204, 0.1);
 }
 
-.employees-table td:nth-child(2) { /* Estilo para a coluna "Foto Perfil" */
-    /* Podemos adicionar estilos específicos aqui se decidirmos exibir imagens */
+.employees-table td {
+    padding: 12px 10px;
+    vertical-align: middle;
+    word-wrap: break-word;
 }
 
-.employees-table td:nth-child(5) { /* Estilo para a coluna "Carga Horária (minutos)" */
-    text-align: center; /* Centraliza a carga horária (opcional) */
+/* Larguras específicas das colunas */
+.employees-table th:nth-child(1),
+.employees-table td:nth-child(1) {
+    width: 60px;
+    /* ID */
+}
+
+.employees-table th:nth-child(2),
+.employees-table td:nth-child(2) {
+    width: 80px;
+    /* Foto */
+}
+
+.employees-table th:nth-child(3),
+.employees-table td:nth-child(3) {
+    width: 25%;
+    /* Nome */
+}
+
+.employees-table th:nth-child(4),
+.employees-table td:nth-child(4) {
+    width: 20%;
+    /* CPF */
+}
+
+.employees-table th:nth-child(5),
+.employees-table td:nth-child(5) {
+    width: 15%;
+    /* Carga Horária */
+}
+
+.employees-table th:nth-child(6),
+.employees-table td:nth-child(6) {
+    width: 120px;
+    /* Ações */
+}
+
+/* Estilos para as fotos de perfil */
+.employees-table td:nth-child(2) img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #3E4042;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.employees-table td:nth-child(2) img:hover {
+    transform: scale(1.1);
+    border-color: #ff8c00;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Estilos para o ícone padrão quando não há foto */
+.employees-table td:nth-child(2) i.fa-user-circle {
+    font-size: 50px;
+    color: #3E4042;
+    transition: all 0.3s ease;
+}
+
+.employees-table td:nth-child(2) i.fa-user-circle:hover {
+    color: #ff8c00;
+    transform: scale(1.1);
+}
+
+.employees-table td:nth-child(5) {
+    /* Estilo para a coluna "Carga Horária" */
+    text-align: center;
+    /* Centraliza a carga horária */
+    font-family: 'Courier New', monospace;
+    /* Fonte monospace para melhor alinhamento */
+}
+
+.employees-table td:last-child {
+    /* Estilo para a coluna "Ações" */
+    text-align: center;
+    /* Centraliza os botões de ação */
+    white-space: nowrap;
+    /* Evita quebra de linha nos botões */
 }
 
 .employees-table .delete-button,
@@ -57,13 +148,162 @@
     cursor: pointer;
     font-size: 15px;
     outline: none;
+    padding: 5px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.employees-table .delete-button {
+    margin-right: 10px;
+    /* Espaço entre excluir e editar */
+}
+
+.employees-table .edit-button {
+    margin-right: 0;
+    /* Remove margem do último botão */
+}
+
+.employees-table .delete-button:hover,
+.employees-table .edit-button:hover {
+    background-color: rgba(255, 255, 255, 0.1);
 }
 
 .employees-table .delete-button .fa-trash-alt:hover,
 .employees-table .edit-button .fa-pencil-alt:hover {
     /* Aplica um gradiente linear horizontal ao texto */
-    background: linear-gradient(to right, #ff8c00, #ff0080); /* Define as cores do gradiente (laranja para rosa) */
-    -webkit-background-clip: text; /* Recorta o fundo para o formato do texto (para navegadores WebKit) */
-    background-clip: text; /* Recorta o fundo para o formato do texto (padrão CSS) */
-    color: transparent; /* Torna a cor do texto transparente para que o gradiente do fundo seja visível */
+    background: linear-gradient(to right, #ff8c00, #ff0080);
+    /* Define as cores do gradiente (laranja para rosa) */
+    -webkit-background-clip: text;
+    /* Recorta o fundo para o formato do texto (para navegadores WebKit) */
+    background-clip: text;
+    /* Recorta o fundo para o formato do texto (padrão CSS) */
+    color: transparent;
+    /* Torna a cor do texto transparente para que o gradiente do fundo seja visível */
+}
+
+/* ==========================================================================
+    MENSAGENS DE ESTADO
+    ========================================================================== */
+
+.no-data-message {
+    animation: fadeIn 0.5s ease-in;
+}
+
+.error-message {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ==========================================================================
+    RESPONSIVIDADE
+    ========================================================================== */
+
+@media (max-width: 768px) {
+    #employees-table-container {
+        width: 95%;
+        margin-top: 15px;
+    }
+
+    .employees-table {
+        font-size: 14px;
+    }
+
+    .employees-table th,
+    .employees-table td {
+        padding: 8px 10px;
+    }
+
+    .employees-table .delete-button,
+    .employees-table .edit-button {
+        margin-right: 5px;
+        font-size: 14px;
+    }
+}
+
+/* Estilos específicos para a coluna de fotos */
+.employees-table th:nth-child(2),
+.employees-table td:nth-child(2) {
+    width: 80px;
+    min-width: 80px;
+    max-width: 80px;
+    text-align: center;
+    vertical-align: middle;
+    padding: 10px;
+}
+
+/* Container para fotos na tabela */
+.employees-table td:nth-child(2) {
+    height: 80px;
+}
+
+/* Estilos para imagens de perfil na tabela */
+.employees-table td:nth-child(2) img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #ddd;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+/* Estilos para ícones de perfil na tabela */
+.employees-table td:nth-child(2) i {
+    font-size: 50px;
+    color: #ccc;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+/* Estilos para a coluna de ações */
+.employees-table th:nth-child(6),
+.employees-table td:nth-child(6) {
+    text-align: center;
+    vertical-align: middle;
+}
+
+/* Botões de ação */
+.edit-button,
+.delete-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    margin: 0 5px;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.edit-button {
+    color: #007ACC;
+}
+
+.edit-button:hover {
+    background-color: rgba(0, 122, 204, 0.1);
+}
+
+.delete-button {
+    color: #dc3545;
+}
+
+.delete-button:hover {
+    background-color: rgba(220, 53, 69, 0.1);
+}
+
+.edit-button i,
+.delete-button i {
+    font-size: 16px;
 }

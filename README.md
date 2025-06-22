@@ -108,30 +108,84 @@ Certifique-se de ter o **Python 3.13** instalado em seu sistema. As dependência
 
 ## Configuração e Execução
 
-1.  **Clone o repositório:**
-    ```bash
-    git clone https://github.com/JulesElo/Counting-Hours.git
-    cd web_counting_hours
-    ```
+### Pré-requisitos
+- **Python 3.13** ou superior
+- **Git** para clonar o repositório
+- **Navegador web** (Chrome, Firefox, Edge, etc.)
 
-2.  **Navegue até o diretório do backend:**
-    ```bash
-    cd backend
-    ```
+### Passo a Passo
 
-3.  **Instale as dependências do backend:**
-    ```bash
-    pip install -r requirements.txt
-    ```
-    *(Certifique-se de que o arquivo `requirements.txt` contenha `Flask` e `Flask-CORS`.)*
+1. **Clone o repositório:**
+   ```powershell
+   git clone https://github.com/JulesElo/Counting-Hours.git
+   cd Counting-Hours
+   ```
 
-4.  **Execute o backend:**
-    ```bash
-    py main.py
-    ```
-    O backend estará rodando em `http://127.0.0.1:5000/` por padrão.
+2. **Navegue até o diretório do projeto:**
+   ```powershell
+   cd web_counting_hours
+   ```
 
-5.  **Abra o arquivo `frontend/index.html` no seu navegador web.**
+3. **Instale as dependências do backend:**
+   ```powershell
+   pip install -r backend/requirements.txt
+   ```
+
+4. **Execute o backend:**
+   ```powershell
+   python main.py
+   ```
+   O backend estará rodando em `http://127.0.0.1:5000/`
+
+5. **Abra o frontend:**
+   - Navegue até a pasta `frontend`
+   - Abra o arquivo `index.html` no seu navegador
+   - Ou use um servidor local simples:
+     ```powershell
+     cd frontend
+     python -m http.server 8000
+     ```
+   - Acesse `http://localhost:8000` no navegador
+
+### Comandos Alternativos (se necessário)
+
+**Para Windows Command Prompt:**
+```cmd
+git clone https://github.com/JulesElo/Counting-Hours.git
+cd Counting-Hours\web_counting_hours
+pip install -r backend\requirements.txt
+python main.py
+```
+
+**Para Linux/Mac:**
+```bash
+git clone https://github.com/JulesElo/Counting-Hours.git
+cd Counting-Hours/web_counting_hours
+pip install -r backend/requirements.txt
+python main.py
+```
+
+### Verificação da Instalação
+
+1. **Backend:** Acesse `http://127.0.0.1:5000/funcionarios/` no navegador
+   - Deve retornar uma lista JSON (pode estar vazia inicialmente)
+
+2. **Frontend:** Acesse `http://localhost:8000` ou abra `index.html`
+   - Deve mostrar a interface do Counting Hours
+
+### Solução de Problemas
+
+**Erro de CORS:**
+- Certifique-se de que o backend está rodando na porta 5000
+- Verifique se o frontend está acessando `http://127.0.0.1:5000`
+
+**Erro de dependências:**
+- Execute: `pip install --upgrade pip`
+- Reinstale as dependências: `pip install -r backend/requirements.txt`
+
+**Porta já em uso:**
+- Altere a porta no arquivo `main.py` linha 14: `app.run(debug=True, host='127.0.0.1', port=5001)`
+- Atualize as URLs no frontend se necessário
 
 [🔝](#top)
 

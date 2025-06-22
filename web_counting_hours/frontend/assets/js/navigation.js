@@ -4,26 +4,14 @@
  */
 
 // ==========================================================================
-// SELEÇÃO DE ELEMENTOS DO DOM (Relacionados à Navegação)
-// ==========================================================================
-const homeButton = document.querySelector('.home-button');
-const employeesButton = document.querySelector('.employees-button');
-const clockContainer = document.querySelector('.clock-container');
-// const mainContent = document.querySelector('.main-content');
-const mainTitleElement = document.querySelector('.title');
-// const employeesTableContainer = document.getElementById('employees-table-container');
-// const addEmployeeButtonModal = document.getElementById('add-employee-button');
-const employeesTitleElement = document.getElementById('employees-title');
-// const sidebar = document.querySelector('.sidebar');
-// let hoverTimeout; // Variável global compartilhada com sidebar.js
-
-// ==========================================================================
 // LÓGICA DOS BOTÕES DE NAVEGAÇÃO
 // ==========================================================================
 
 // Adiciona um ouvinte de evento de clique ao botão de início (Home)
 if (homeButton) {
     homeButton.addEventListener('click', () => {
+        console.log('Navegando para Home...');
+
         // Exibe novamente o container do relógio
         if (clockContainer) {
             clockContainer.style.display = 'flex'; // Garante que seja exibido como flex
@@ -44,30 +32,23 @@ if (homeButton) {
             addEmployeeButtonModal.style.display = 'none';
         }
 
-        // Remover mensagens de erro ou "nenhum encontrado" ao voltar para a página inicial
-        const existingErrorMessage = mainContent.querySelector('.error-message');
-        if (existingErrorMessage) {
-            mainContent.removeChild(existingErrorMessage);
-        }
-        const existingNoDataMessage = mainContent.querySelector('.no-data-message');
-        if (existingNoDataMessage) {
-            mainContent.removeChild(existingNoDataMessage);
+        // Limpa completamente a área de funcionários
+        if (typeof clearEmployeesArea === 'function') {
+            clearEmployeesArea();
+        } else {
+            // Fallback se a função não estiver disponível
+            if (employeesTableContainer) {
+                employeesTableContainer.innerHTML = '';
+            }
+            const existingMessages = mainContent.querySelectorAll('.error-message, .no-data-message');
+            existingMessages.forEach(message => {
+                if (message.parentNode) {
+                    message.parentNode.removeChild(message);
+                }
+            });
         }
 
-        // Limpa qualquer tabela existente
-        if (employeesTableContainer) {
-            employeesTableContainer.innerHTML = '';
-        }
-
-        // Se a barra estiver expandida, recolhe (reutilizando a lógica do sidebar)
-        if (sidebar && sidebar.classList.contains('expanded')) {
-            sidebar.classList.remove('expanded');
-            sidebar.classList.add('no-hover');
-            clearTimeout(hoverTimeout);
-            hoverTimeout = setTimeout(() => {
-                sidebar.classList.remove('no-hover');
-            }, 500);
-        }
+        // A lógica do sidebar é gerenciada pelo sidebar.js
 
         // Adiciona o container do relógio de volta ao main-content
         if (clockContainer) {
@@ -79,6 +60,8 @@ if (homeButton) {
 // Adiciona um ouvinte de evento de clique ao botão de funcionários
 if (employeesButton) {
     employeesButton.addEventListener('click', () => {
+        console.log('Navegando para Funcionários...');
+
         // Oculta o container do relógio
         if (clockContainer) {
             clockContainer.style.display = 'none';
@@ -99,22 +82,25 @@ if (employeesButton) {
             addEmployeeButtonModal.style.display = 'block';
         }
 
-        // Limpar o container da tabela antes de buscar e renderizar
-        if (employeesTableContainer) {
-            employeesTableContainer.innerHTML = ''; // Limpa qualquer tabela anterior
+        // Limpa completamente a área de funcionários antes de buscar
+        if (typeof clearEmployeesArea === 'function') {
+            clearEmployeesArea();
+        } else {
+            // Fallback se a função não estiver disponível
+            if (employeesTableContainer) {
+                employeesTableContainer.innerHTML = '';
+            }
+            const existingMessages = mainContent.querySelectorAll('.error-message, .no-data-message');
+            existingMessages.forEach(message => {
+                if (message.parentNode) {
+                    message.parentNode.removeChild(message);
+                }
+            });
         }
 
-        // Se a barra estiver expandida, recolhe (reutilizando a lógica do sidebar)
-        if (sidebar && sidebar.classList.contains('expanded')) {
-            sidebar.classList.remove('expanded');
-            sidebar.classList.add('no-hover');
-            clearTimeout(hoverTimeout);
-            hoverTimeout = setTimeout(() => {
-                sidebar.classList.remove('no-hover');
-            }, 500);
-        }
+        // A lógica do sidebar é gerenciada pelo sidebar.js
 
-        // Chama a função para buscar e exibir os funcionários (esta função será movida depois)
+        // Chama a função para buscar e exibir os funcionários
         fetchEmployees();
     });
 }

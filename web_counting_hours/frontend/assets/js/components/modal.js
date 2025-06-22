@@ -4,15 +4,10 @@
  */
 
 // ==========================================================================
-// SELEÇÃO DE ELEMENTOS DO DOM (Relacionados ao Modal)
+// VARIÁVEIS GLOBAIS
 // ==========================================================================
-const addEmployeeButtonModal = document.getElementById('add-employee-button');
-const addEmployeeModal = document.getElementById('add-employee-modal');
-const closeButton = document.querySelector('.close-button');
-const cancelButton = document.querySelector('.cancel-button');
-const addEmployeeForm = document.getElementById('add-employee-form');
-const cpfInputModal = document.getElementById('cpf'); // CPF input dentro do modal
-let currentEmployeeId = null; // Variável para armazenar o ID do funcionário sendo editado
+
+let cpfOriginal = null; // Para armazenar o CPF original durante edição
 
 // ==========================================================================
 // FUNÇÕES DE CONTROLE DO MODAL
@@ -50,32 +45,154 @@ if (cancelButton) {
     });
 }
 
-// Reseta o formulário do modal para o estado inicial (para adicionar novo funcionário)
+// ==========================================================================
+// FUNÇÃO PARA RESETAR O FORMULÁRIO DO MODAL
+// ==========================================================================
 function resetModalForm() {
+    // Resetar campos do formulário
+    document.getElementById('add-employee-form').reset();
+
+    // Limpar a foto atual
+    const currentProfilePic = document.getElementById('current-profile-pic');
+    if (currentProfilePic) {
+        currentProfilePic.style.display = 'none';
+    }
+
+    // Resetar o título do modal
     const modalTitle = document.querySelector('#add-employee-modal h2');
     if (modalTitle) {
         modalTitle.textContent = 'Adicionar Novo Funcionário';
     }
+
+    // Resetar o texto do botão de salvar
     const submitButton = document.querySelector('#add-employee-form button[type="submit"]');
     if (submitButton) {
         submitButton.textContent = 'Salvar';
     }
-    currentEmployeeId = null; // Reseta o ID para indicar que é uma nova adição
-    addEmployeeForm.reset(); // Limpa os campos do formulário
-    // Define a carga normal como padrão ao adicionar
-    const cargaNormalRadio = document.getElementById('carga_normal');
-    if (cargaNormalRadio) {
-        cargaNormalRadio.checked = true;
-    }
-    const cargaOutroRadio = document.getElementById('carga_outro');
-    if (cargaOutroRadio) {
-        cargaOutroRadio.checked = false;
-    }
-    const cargaHorariaOutroInput = document.getElementById('carga_horaria_outro');
-    if (cargaHorariaOutroInput) {
-        cargaHorariaOutroInput.value = ''; // Limpa o campo de outra carga horária
+
+    // Limpar variáveis de controle
+    currentEmployeeId = null;
+    cpfOriginal = null;
+}
+
+// ==========================================================================
+// FUNÇÕES DE VALIDAÇÃO DE CPF
+// ==========================================================================
+
+/**
+ * Verifica se o CPF já existe na base de dados
+ * @param {string} cpf - CPF a ser verificado
+ * @returns {Promise<boolean>} - true se existe, false caso contrário
+ */
+async function verificarCPFDuplicado(cpf) {
+    try {
+        const response = await fetch('http://127.0.0.1:5000/funcionarios/verificar-cpf', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ cpf: cpf })
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        // Verificar o status da resposta
+        if (data.status === 'cpf_existente') {
+            return true; // CPF já existe
+        } else if (data.status === 'cpf_valido') {
+            return false; // CPF está disponível
+        } else {
+            console.error('Status inesperado:', data.status);
+            return false;
+        }
+    } catch (error) {
+        console.error('Erro ao verificar CPF:', error);
+        throw error; // Re-throw para tratamento no caller
     }
 }
+
+/**
+ * Valida se o campo CPF está vazio ou não foi alterado
+ * @param {string} cpf - CPF atual
+ * @param {string} cpfOriginal - CPF original (para edição)
+ * @returns {boolean} - true se vazio ou não alterado, false caso contrário
+ */
+function validarCampoVazioOuNaoAlterado(cpf, cpfOriginal = null) {
+    const cpfLimpo = cpf.trim();
+
+    // Se estiver vazio
+    if (!cpfLimpo) {
+        return true;
+    }
+
+    // Se for edição e não foi alterado
+    if (cpfOriginal && cpfLimpo === cpfOriginal) {
+        return true;
+    }
+
+    return false;
+}
+
+/**
+ * Exibe mensagem de erro usando SweetAlert
+ * @param {string} mensagem - Mensagem a ser exibida
+ */
+function exibirMensagemErro(mensagem) {
+    Swal.fire({
+        icon: 'warning',
+        title: 'Validação',
+        text: mensagem,
+        confirmButtonColor: '#ffc107',
+        background: '#2c3e50',
+        color: '#ecf0f1'
+    });
+}
+
+/**
+ * Exibe mensagem de sucesso usando SweetAlert
+ * @param {string} mensagem - Mensagem a ser exibida
+ */
+function exibirMensagemSucesso(mensagem) {
+    Swal.fire({
+        icon: 'success',
+        title: 'Sucesso!',
+        text: mensagem,
+        confirmButtonColor: '#28a745',
+        background: '#2c3e50',
+        color: '#ecf0f1'
+    });
+}
+
+// ==========================================================================
+// CONFIGURAÇÃO DO CAMPO CPF
+// ==========================================================================
+
+// Configurar o campo CPF para aceitar apenas números
+document.addEventListener('DOMContentLoaded', function () {
+    const cpfInput = document.getElementById('cpf');
+    if (cpfInput) {
+        cpfInput.addEventListener('input', function (e) {
+            // Remove tudo que não é número
+            let value = e.target.value.replace(/\D/g, '');
+
+            // Limita a 11 dígitos
+            if (value.length > 11) {
+                value = value.substring(0, 11);
+            }
+
+            // Aplica formatação (opcional)
+            if (value.length > 0) {
+                value = value.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+            }
+
+            e.target.value = value;
+        });
+    }
+});
 
 // ==========================================================================
 // LÓGICA DE FORMATAÇÃO DO CPF NO MODAL
@@ -92,7 +209,7 @@ if (cpfInputModal) {
             }
             formattedValue += value[i];
         }
-        this.value = formattedValue.slice(0, 14); // Limita o tamanho para 14 caracteres
+        this.value = formattedValue;
     });
 }
 
@@ -100,25 +217,117 @@ if (cpfInputModal) {
 // LÓGICA DE SUBMISSÃO DO FORMULÁRIO DO MODAL
 // ==========================================================================
 if (addEmployeeForm) {
-    addEmployeeForm.addEventListener('submit', (event) => {
-        event.preventDefault();
+    addEmployeeForm.addEventListener('submit', async function (e) {
+        e.preventDefault();
 
-        const profilePic = document.getElementById('profile_pic').files[0];
-        const name = document.getElementById('name').value;
-        const cpf = document.getElementById('cpf').value;
-        let cargaHoraria;
-        const cargaNormalRadio = document.getElementById('carga_normal');
-        const cargaOutroRadio = document.getElementById('carga_outro');
-        const cargaHorariaOutroInput = document.getElementById('carga_horaria_outro');
-
-        if (cargaNormalRadio.checked) {
-            cargaHoraria = cargaNormalRadio.value;
-        } else if (cargaOutroRadio.checked) {
-            cargaHoraria = cargaHorariaOutroInput.value;
-        } else {
-            console.warn('Nenhuma opção de carga horária selecionada.');
+        // Prevenir duplo clique
+        const submitButton = this.querySelector('button[type="submit"]');
+        if (submitButton.disabled) {
             return;
         }
+        submitButton.disabled = true;
+
+        // Obter valores dos campos
+        const name = document.getElementById('name').value.trim();
+        const cpf = document.getElementById('cpf').value.trim();
+        const profilePic = document.getElementById('profile_pic').files[0];
+        const cargaHoraria = "8:48"; // Carga horária padrão fixa
+
+        // ==========================================================================
+        // FLUXO DE VALIDAÇÃO CONFORME ESPECIFICAÇÃO
+        // ==========================================================================
+
+        // 1. Validação do nome do funcionário vazio
+        if (!name) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Campo Obrigatório',
+                text: 'Por favor, informe o nome do funcionário.',
+                confirmButtonColor: '#ffc107',
+                background: '#2c3e50',
+                color: '#ecf0f1'
+            });
+            submitButton.disabled = false;
+            return; // Não prossegue com a requisição
+        }
+
+        // 2. Validação do CPF vazio
+        if (!cpf) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Campo Obrigatório',
+                text: 'Por favor, informe o CPF.',
+                confirmButtonColor: '#ffc107',
+                background: '#2c3e50',
+                color: '#ecf0f1'
+            });
+            submitButton.disabled = false;
+            return; // Não prossegue com a requisição
+        }
+
+        // 3. Validação do CPF com menos de 11 dígitos
+        const cpfNumeros = cpf.replace(/\D/g, '');
+        if (cpfNumeros.length < 11) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'CPF Inválido',
+                text: 'O CPF deve conter no mínimo 11 dígitos.',
+                confirmButtonColor: '#ffc107',
+                background: '#2c3e50',
+                color: '#ecf0f1'
+            });
+            submitButton.disabled = false;
+            return; // Não prossegue com a requisição
+        }
+
+        // 4. Validação de CPF duplicado (apenas para novos funcionários)
+        if (!currentEmployeeId) {
+            try {
+                const cpfExiste = await verificarCPFDuplicado(cpf);
+                if (cpfExiste) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'CPF Duplicado',
+                        text: 'CPF já existente.',
+                        confirmButtonColor: '#ffc107',
+                        background: '#2c3e50',
+                        color: '#ecf0f1'
+                    });
+                    submitButton.disabled = false;
+                    return; // Não salva nem fecha o modal
+                }
+            } catch (error) {
+                console.error('Erro ao verificar CPF:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Erro',
+                    text: 'Erro ao verificar CPF. Tente novamente.',
+                    confirmButtonColor: '#dc3545',
+                    background: '#2c3e50',
+                    color: '#ecf0f1'
+                });
+                submitButton.disabled = false;
+                return;
+            }
+        }
+
+        // ==========================================================================
+        // EXECUÇÃO DO FLUXO DE INCLUSÃO
+        // ==========================================================================
+
+        // Mostrar loading
+        Swal.fire({
+            title: 'Salvando...',
+            text: 'Aguarde enquanto salvamos os dados.',
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            showConfirmButton: false,
+            didOpen: () => {
+                Swal.showLoading();
+            },
+            background: '#2c3e50',
+            color: '#ecf0f1'
+        });
 
         const formData = new FormData();
         formData.append('name', name);
@@ -131,29 +340,121 @@ if (addEmployeeForm) {
         }
 
         const method = currentEmployeeId ? 'PUT' : 'POST';
-        const url = currentEmployeeId ? `http://127.0.0.1:5000/funcionarios/${currentEmployeeId}` : 'http://127.0.0.1:5000/funcionarios';
+        const url = currentEmployeeId ? `http://127.0.0.1:5000/funcionarios/${currentEmployeeId}` : 'http://127.0.0.1:5000/funcionarios/';
+
+        console.log('DEBUG: Enviando requisição:', { method, url, currentEmployeeId });
 
         fetch(url, {
             method: method,
             body: formData,
         })
             .then(response => {
+                console.log('DEBUG: Resposta recebida:', response.status, response.statusText);
                 if (!response.ok) {
-                    return response.json().then(err => { throw err; });
+                    return response.json().then(data => {
+                        throw { status: response.status, data: data };
+                    });
                 }
                 return response.json();
             })
             .then(data => {
-                console.log(`${method === 'PUT' ? 'Funcionário atualizado' : 'Funcionário adicionado'} com sucesso:`, data);
-                addEmployeeModal.style.display = 'none';
-                fetchEmployees(); // Recarrega a lista de funcionários após a operação
-                currentEmployeeId = null; // Reseta o ID após a edição/adição
-                resetModalForm();
-                // TODO: Exibir mensagem de sucesso visualmente
+                console.log('DEBUG: Dados da resposta:', data);
+                // Sucesso - CPF e nome válidos + CPF único
+                const isEdit = currentEmployeeId ? true : false;
+                const message = isEdit ? 'Funcionário alterado com sucesso.' : 'Funcionário incluído com sucesso.';
+
+                console.log('DEBUG: Operação realizada com sucesso, mostrando toast...');
+
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'success',
+                    title: message,
+                    showConfirmButton: false,
+                    timer: 2000,
+                    timerProgressBar: true,
+                    background: '#2c3e50',
+                    color: '#ecf0f1',
+                    didClose: () => {
+                        console.log('DEBUG: Toast fechado, fechando modal e atualizando lista...');
+                        // Fechar modal e atualizar lista
+                        addEmployeeModal.style.display = 'none';
+                        // Resetar formulário apenas se não for edição
+                        if (!isEdit) {
+                            resetModalForm();
+                        } else {
+                            // Para edição, apenas limpar o currentEmployeeId
+                            currentEmployeeId = null;
+                            cpfOriginal = null;
+                        }
+                        fetchEmployees();
+                    }
+                });
             })
             .catch(error => {
-                console.error(`Erro ao ${method === 'PUT' ? 'atualizar' : 'adicionar'} funcionário:`, error);
-                // TODO: Exibir mensagem de erro visualmente
+                console.error('Erro:', error);
+                console.log('Status:', error.status);
+                console.log('Dados:', error.data);
+
+                let title, text, icon, color;
+
+                // Verificar se é erro de rede/CORS
+                if (error.message && error.message.includes('Failed to fetch')) {
+                    title = 'Erro de Conexão';
+                    text = 'Não foi possível conectar ao servidor. Verifique se o backend está rodando.';
+                    icon = 'error';
+                    color = '#dc3545';
+                } else if (error.status === 400) {
+                    if (error.data && error.data.error === 'missing_fields') {
+                        title = 'Campos Obrigatórios';
+                        text = 'Todos os campos são obrigatórios.';
+                        icon = 'warning';
+                        color = '#ffc107';
+                    } else if (error.data && error.data.error === 'invalid_hours') {
+                        title = 'Carga Horária Inválida';
+                        text = error.data.message || 'Formato de carga horária inválido.';
+                        icon = 'warning';
+                        color = '#ffc107';
+                    } else {
+                        title = 'Dados Inválidos';
+                        text = error.data ? error.data.message : 'Verifique os dados informados.';
+                        icon = 'warning';
+                        color = '#ffc107';
+                    }
+                } else if (error.status === 409 && error.data && error.data.error === 'duplicate_cpf') {
+                    title = 'CPF Duplicado';
+                    text = error.data.message || 'Este CPF já está cadastrado no sistema.';
+                    icon = 'warning';
+                    color = '#ffc107';
+                } else if (error.status === 404 && error.data && error.data.error === 'not_found') {
+                    title = 'Funcionário Não Encontrado';
+                    text = error.data.message || 'Funcionário não encontrado.';
+                    icon = 'error';
+                    color = '#dc3545';
+                } else if (error.status === 500) {
+                    title = 'Erro do Servidor';
+                    text = error.data ? error.data.message : 'Erro interno do servidor. Tente novamente.';
+                    icon = 'error';
+                    color = '#dc3545';
+                } else {
+                    title = 'Erro!';
+                    text = error.data ? error.data.message : 'Ocorreu um erro inesperado. Tente novamente.';
+                    icon = 'error';
+                    color = '#dc3545';
+                }
+
+                Swal.fire({
+                    icon: icon,
+                    title: title,
+                    text: text,
+                    confirmButtonColor: color,
+                    background: '#2c3e50',
+                    color: '#ecf0f1'
+                });
+            })
+            .finally(() => {
+                // Reabilitar o botão
+                submitButton.disabled = false;
             });
     });
 }
@@ -190,24 +491,34 @@ function openEditModal() {
             document.getElementById('name').value = employeeData.nome;
             document.getElementById('cpf').value = employeeData.cpf;
 
-            // Lógica para preencher a carga horária
-            const cargaNormalRadio = document.getElementById('carga_normal');
-            const cargaOutroRadio = document.getElementById('carga_outro');
-            const cargaHorariaOutroInput = document.getElementById('carga_horaria_outro');
-            const cargaHorariaMinutes = employeeData.carga_horaria;
-            const hours = Math.floor(cargaHorariaMinutes / 60);
-            const minutes = cargaHorariaMinutes % 60;
-            const formattedTime = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+            // Armazenar o CPF original para validação
+            cpfOriginal = employeeData.cpf;
 
-            // Verifique o valor da carga horária do funcionário e selecione o radio button correto
-            if (cargaHorariaMinutes === 528) { // 8 horas e 48 minutos em minutos (8 * 60 + 48)
-                if (cargaNormalRadio) cargaNormalRadio.checked = true;
-                if (cargaOutroRadio) cargaOutroRadio.checked = false;
-                if (cargaHorariaOutroInput) cargaHorariaOutroInput.value = '';
-            } else {
-                if (cargaNormalRadio) cargaNormalRadio.checked = false;
-                if (cargaOutroRadio) cargaOutroRadio.checked = true;
-                if (cargaHorariaOutroInput) cargaHorariaOutroInput.value = formattedTime;
+            // Sempre marcar a carga horária padrão (8:48)
+            const cargaNormalRadio = document.getElementById('carga_normal');
+            if (cargaNormalRadio) cargaNormalRadio.checked = true;
+
+            // Exibir a foto atual do funcionário (se existir)
+            const currentProfilePic = document.getElementById('current-profile-pic');
+            const currentProfileImg = document.getElementById('current-profile-img');
+            const profilePicInput = document.getElementById('profile_pic');
+
+            if (currentProfilePic && currentProfileImg) {
+                // Verificar se o funcionário tem foto
+                if (employeeData.id) {
+                    const photoUrl = `http://127.0.0.1:5000/funcionarios/profile_pic/${employeeData.id}?t=${Date.now()}`;
+                    currentProfileImg.src = photoUrl;
+                    currentProfileImg.onerror = function () {
+                        // Se a foto não carregar, ocultar o container
+                        currentProfilePic.style.display = 'none';
+                    };
+                    currentProfileImg.onload = function () {
+                        // Se a foto carregar, mostrar o container
+                        currentProfilePic.style.display = 'block';
+                    };
+                } else {
+                    currentProfilePic.style.display = 'none';
+                }
             }
 
             // Mostrar o modal

@@ -1,7 +1,7 @@
 # backend/app/database.py
 
 import sqlite3
-from ..config import DATABASE_NAME  # Importando a constante do arquivo de configuração
+from backend.config import DATABASE_NAME  # Importando a constante do arquivo de configuração
 
 def create_connection():
     """Cria uma conexão com o banco de dados SQLite."""
@@ -61,24 +61,46 @@ def insert_funcionario(foto_perfil, nome, cpf, carga_horaria_str):
             minutes = _convert_to_minutes(carga_horaria_str)
             if minutes is None:
                 print(f"Erro ao converter carga horária '{carga_horaria_str}' para minutos para o funcionário '{nome}'.")
-                return None
+                return {'error': 'invalid_hours', 'message': 'Carga horária inválida'}
+
+            # Verificar se o CPF já existe antes de inserir
+            cursor.execute("SELECT COUNT(*) FROM funcionarios WHERE cpf = ?", (cpf,))
+            count = cursor.fetchone()[0]
+            
+            if count > 0:
+                print(f"CPF '{cpf}' já existe no banco!")
+                return {'error': 'duplicate_cpf', 'message': 'CPF já cadastrado'}
 
             sql = """
                 INSERT INTO funcionarios (foto_perfil, nome, cpf, carga_horaria)
                 VALUES (?, ?, ?, ?)
             """
+            
             cursor.execute(sql, (foto_perfil, nome, cpf, minutes))
             conn.commit()
-            print(f"Funcionário '{nome}' inserido com sucesso com carga horária de {minutes} minutos.")
-            return cursor.lastrowid   # Retorna o ID do novo funcionário
+            new_id = cursor.lastrowid
+            print(f"Funcionário '{nome}' inserido com sucesso com ID {new_id} e carga horária de {minutes} minutos.")
+            return {'success': True, 'id': new_id}   # Retorna sucesso com ID
         except sqlite3.IntegrityError as e:
-            print(f"Erro ao inserir funcionário '{nome}': CPF já existe.")
-            return None
+            error_msg = str(e).lower()
+            
+            # Verificar se é especificamente um erro de CPF duplicado
+            if "unique constraint failed" in error_msg and "cpf" in error_msg:
+                print(f"Erro ao inserir funcionário '{nome}': CPF já existe.")
+                return {'error': 'duplicate_cpf', 'message': 'CPF já cadastrado'}
+            elif "unique constraint failed" in error_msg:
+                print(f"Erro de constraint único ao inserir funcionário '{nome}': {e}")
+                return {'error': 'integrity_error', 'message': 'Erro de integridade do banco'}
+            else:
+                print(f"Erro de integridade ao inserir funcionário '{nome}': {e}")
+                return {'error': 'integrity_error', 'message': 'Erro de integridade do banco'}
         except sqlite3.Error as e:
             print(f"Erro geral ao inserir funcionário: {e}")
-            return None
+            return {'error': 'database_error', 'message': 'Erro no banco de dados'}
         finally:
             conn.close()
+    else:
+        return {'error': 'connection_error', 'message': 'Erro de conexão com banco'}
 
 def get_all_funcionarios():
     """Busca todos os funcionários da tabela funcionarios."""
@@ -104,7 +126,7 @@ def update_funcionario(id, foto_perfil, nome, cpf, carga_horaria_str):
             minutes = _convert_to_minutes(carga_horaria_str)
             if minutes is None:
                 print(f"Erro ao converter carga horária '{carga_horaria_str}' para minutos para o funcionário com ID {id}.")
-                return False
+                return {'error': 'invalid_hours', 'message': 'Carga horária inválida'}
 
             sql = """
                 UPDATE funcionarios
@@ -118,18 +140,24 @@ def update_funcionario(id, foto_perfil, nome, cpf, carga_horaria_str):
             conn.commit()
             if cursor.rowcount > 0:
                 print(f"Funcionário com ID {id} atualizado com sucesso.")
-                return True
+                return {'success': True, 'message': 'Funcionário atualizado com sucesso'}
             else:
                 print(f"Nenhum funcionário encontrado com o ID {id} para atualizar.")
-                return False
+                return {'error': 'not_found', 'message': 'Funcionário não encontrado'}
         except sqlite3.IntegrityError as e:
-            print(f"Erro ao atualizar funcionário com ID {id}: CPF '{cpf}' já existe.")
-            return False
+            if "UNIQUE constraint failed" in str(e) and "cpf" in str(e).lower():
+                print(f"Erro ao atualizar funcionário com ID {id}: CPF '{cpf}' já existe.")
+                return {'error': 'duplicate_cpf', 'message': 'CPF já cadastrado'}
+            else:
+                print(f"Erro de integridade ao atualizar funcionário com ID {id}: {e}")
+                return {'error': 'integrity_error', 'message': 'Erro de integridade do banco'}
         except sqlite3.Error as e:
             print(f"Erro geral ao atualizar funcionário com ID {id}: {e}")
-            return False
+            return {'error': 'database_error', 'message': 'Erro no banco de dados'}
         finally:
             conn.close()
+    else:
+        return {'error': 'connection_error', 'message': 'Erro de conexão com banco'}
 
 def delete_funcionario(id):
     """Deleta um funcionário da tabela funcionarios com base no ID."""
@@ -142,15 +170,17 @@ def delete_funcionario(id):
             conn.commit()
             if cursor.rowcount > 0:
                 print(f"Funcionário com ID {id} deletado com sucesso.")
-                return True
+                return {'success': True, 'message': 'Funcionário deletado com sucesso'}
             else:
                 print(f"Nenhum funcionário encontrado com o ID {id} para deletar.")
-                return False
+                return {'error': 'not_found', 'message': 'Funcionário não encontrado'}
         except sqlite3.Error as e:
             print(f"Erro geral ao deletar funcionário com ID {id}: {e}")
-            return False
+            return {'error': 'database_error', 'message': 'Erro no banco de dados'}
         finally:
             conn.close()
+    else:
+        return {'error': 'connection_error', 'message': 'Erro de conexão com banco'}
 
 def get_funcionario_por_id(id):
     """Busca um funcionário da tabela funcionarios com base no ID."""

@@ -1,3 +1,8 @@
+/*
+ * frontend/assets/js/components/importCSVModal.js
+ * Descrição: Lógica para o modal de importação CSV com SweetAlert2
+ */
+
 document.addEventListener("DOMContentLoaded", () => {
     const importCSVButton = document.querySelector(".import-csv");
     const importModal = document.getElementById("import-csv-modal");
@@ -12,10 +17,19 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // ADICIONAR EVENT LISTENER APENAS UMA VEZ AQUI
+    // Event listener para o select de funcionários
     const employeeSelect = document.getElementById('employee-select');
     if (employeeSelect) {
         employeeSelect.addEventListener('change', fillEmployeeData);
+    }
+
+    // Event listener para o formulário
+    const importCsvForm = document.getElementById('import-csv-form');
+    if (importCsvForm) {
+        importCsvForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            processarCSVeGerarPlanilha();
+        });
     }
 });
 
@@ -24,10 +38,10 @@ document.addEventListener("DOMContentLoaded", () => {
 // ==========================================================================
 function loadEmployeesIntoSelect() {
     const employeeSelect = document.getElementById('employee-select');
-    
+
     // Limpa opções existentes
-    employeeSelect.innerHTML = '<option value=""> </option>';
-    
+    employeeSelect.innerHTML = '<option value="">Selecione um funcionário...</option>';
+
     fetch(`http://127.0.0.1:5000/funcionarios`)
         .then(response => {
             if (!response.ok) {
@@ -36,20 +50,12 @@ function loadEmployeesIntoSelect() {
             return response.json();
         })
         .then(funcionarios => {
-            console.log('Funcionários recebidos:', funcionarios); 
-            
             funcionarios.forEach(funcionario => {
-                console.log('🔍 Processando funcionário:', funcionario);
-                
                 const option = document.createElement('option');
-
                 option.value = funcionario[0];
-                option.textContent = funcionario[2]; 
+                option.textContent = funcionario[2];
                 employeeSelect.appendChild(option);
-                
-                console.log('Option criada - Value:', option.value, 'Text:', option.textContent); 
             });
-            
         })
         .catch(error => {
             console.error('Erro ao carregar funcionários:', error);
@@ -72,64 +78,57 @@ function fillEmployeeData() {
     }
 
     const selectedEmployeeId = employeeSelect.value;
-    console.log('ID selecionado:', selectedEmployeeId);
-    console.log('Tipo do ID:', typeof selectedEmployeeId);
-    console.log('Select HTML:', employeeSelect.outerHTML); // DEBUG COMPLETO
-
-    // Referências aos campos
     const employeeNameField = document.getElementById('employee-name');
     const employeeCpfField = document.getElementById('employee-cpf');
     const employeeHoursField = document.getElementById('employee-hours');
 
-    // VALIDAÇÃO MELHORADA
+    // Limpar campos se nenhum funcionário selecionado
     if (!selectedEmployeeId || selectedEmployeeId === "") {
-        console.log('Nenhum funcionário selecionado, limpando campos...');
         employeeNameField.value = '';
         employeeCpfField.value = '';
         employeeHoursField.value = '';
         return;
     }
 
-    // ADICIONAR LOADING VISUAL (OPCIONAL)
+    // Mostrar loading
     employeeNameField.value = 'Carregando...';
     employeeCpfField.value = 'Carregando...';
     employeeHoursField.value = 'Carregando...';
 
-    // Fazer fetch do funcionário específico
+    // Buscar dados do funcionário
     fetch(`http://127.0.0.1:5000/funcionarios/${selectedEmployeeId}`)
         .then(response => {
             if (!response.ok) {
-                return response.text().then(text => { 
-                    throw new Error(`Erro HTTP: ${response.status} - ${text}`); 
+                return response.text().then(text => {
+                    throw new Error(`Erro HTTP: ${response.status} - ${text}`);
                 });
             }
             return response.json();
         })
         .then(employeeData => {
-            console.log('Dados do funcionário recebidos:', employeeData);
-            
-            // CORREÇÃO: Usar índices se vier como array também
+            // Verificar se os dados vieram como array ou objeto
+            let nome, cpf, cargaHorariaMinutes;
+
             if (Array.isArray(employeeData)) {
-                employeeNameField.value = employeeData[2] || ''; // Nome na posição 2
-                employeeCpfField.value = employeeData[3] || '';  // CPF na posição 3
-                
-                // Converter carga horária minutos para HH:MM
-                const cargaHorariaMinutes = employeeData[4] || 0; // Carga horária na posição 4
-                const hours = Math.floor(cargaHorariaMinutes / 60);
-                const minutes = cargaHorariaMinutes % 60;
-                const formattedTime = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
-                employeeHoursField.value = formattedTime;
+                // Se vier como array (formato antigo)
+                nome = employeeData[2] || '';
+                cpf = employeeData[3] || '';
+                cargaHorariaMinutes = employeeData[4] || 0;
             } else {
-                // Se vier como objeto (caso normal)
-                employeeNameField.value = employeeData.nome || '';
-                employeeCpfField.value = employeeData.cpf || '';
-                
-                const cargaHorariaMinutes = employeeData.carga_horaria || 0;
-                const hours = Math.floor(cargaHorariaMinutes / 60);
-                const minutes = cargaHorariaMinutes % 60;
-                const formattedTime = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
-                employeeHoursField.value = formattedTime;
+                // Se vier como objeto (formato novo)
+                nome = employeeData.nome || '';
+                cpf = employeeData.cpf || '';
+                cargaHorariaMinutes = employeeData.carga_horaria || 0;
             }
+
+            // Converter carga horária de minutos para HH:MM
+            const hours = Math.floor(cargaHorariaMinutes / 60);
+            const minutes = cargaHorariaMinutes % 60;
+            const formattedTime = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+
+            employeeNameField.value = nome;
+            employeeCpfField.value = cpf;
+            employeeHoursField.value = formattedTime;
         })
         .catch(error => {
             console.error('Erro ao buscar dados do funcionário:', error);
@@ -144,8 +143,8 @@ function fillEmployeeData() {
 // ==========================================================================
 function openImportCsvModal() {
     const importCsvModal = document.getElementById('import-csv-modal');
-    
-    // Limpar os campos primeiro
+
+    // Limpar os campos
     document.getElementById('employee-name').value = '';
     document.getElementById('employee-cpf').value = '';
     document.getElementById('employee-hours').value = '';
@@ -153,193 +152,16 @@ function openImportCsvModal() {
     document.getElementById('start-date').value = '';
     document.getElementById('end-date').value = '';
     document.getElementById('csv_file').value = '';
-    
-    // Carregar os funcionários DEPOIS de limpar
+
+    // Carregar funcionários
     loadEmployeesIntoSelect();
-    
+
     // Mostrar o modal
     importCsvModal.classList.add('active');
 }
 
 // ==========================================================================
-// EVENT LISTENER DO FORMULÁRIO
-// ==========================================================================
-document.addEventListener('DOMContentLoaded', function() {
-    const importCsvForm = document.getElementById('import-csv-form');
-    if (importCsvForm) {
-        importCsvForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            processarCSVeGerarPlanilha();
-        });
-    }
-});
-
-// ==========================================================================
-// FUNÇÃO PARA MOSTRAR POPUP PERSONALIZADO
-// ==========================================================================
-function showCustomAlert(message, type = 'error') {
-    // Remove popup existente se houver
-    const existingPopup = document.getElementById('custom-alert');
-    if (existingPopup) {
-        existingPopup.remove();
-    }
-    
-    // Criar popup
-    const popup = document.createElement('div');
-    popup.id = 'custom-alert';
-    popup.innerHTML = `
-        <div class="popup-overlay">
-            <div class="popup-content ${type}">
-                <div class="popup-header">
-                    <h3>${type === 'error' ? '❌ Erro' : type === 'success' ? '✅ Sucesso' : 'ℹ️ Aviso'}</h3>
-                </div>
-                <div class="popup-body">
-                    <p>${message}</p>
-                </div>
-                <div class="popup-footer">
-                    <button onclick="closeCustomAlert()" class="popup-btn">OK</button>
-                </div>
-            </div>
-        </div>
-    `;
-
-    // Estilos CSS inline
-    popup.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: 10000;
-    `;
-
-    const style = document.createElement('style');
-    style.textContent = `
-        .popup-overlay {
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .popup-content {
-            background: rgba(27, 28, 30, 0.95);
-            border-radius: 8px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-            max-width: 400px;
-            width: 90%;
-            animation: popupIn 0.3s ease;
-            color: #BFBFBF;
-        }
-
-        .popup-content.error { 
-            border-top: 4px solid #d9534f; 
-        }
-
-        .popup-content.success { 
-            border-top: 4px solid #5cb85c; 
-        }
-
-        .popup-content.warning { 
-            border-top: 4px solid #ff8c00; 
-        }
-
-        .popup-header {
-            padding: 20px 20px 0;
-            text-align: center;
-        }
-
-        .popup-header h3 {
-            margin: 0;
-            font-size: 18px;
-            color: #BFBFBF;
-        }
-
-        .popup-body {
-            padding: 15px 20px;
-            text-align: center;
-        }
-
-        .popup-body p {
-            margin: 0;
-            color: #BFBFBF;
-            line-height: 1.5;
-        }
-
-        .popup-footer {
-            padding: 0 20px 20px;
-            text-align: center;
-        }
-
-        .popup-btn {
-            background: #007ACC;
-            color: white;
-            border: none;
-            padding: 10px 30px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: background 0.3s ease;
-        }
-
-        .popup-btn:hover {
-            background: #005A9F;
-        }
-
-        .popup-btn.cancel {
-            background: transparent;
-            color: #BFBFBF;
-            border: 1px solid #BFBFBF;
-            margin-left: 10px;
-        }
-
-        .popup-btn.cancel:hover {
-            background: rgba(191, 191, 191, 0.1);
-        }
-
-        .popup-btn.error {
-            background: #d9534f;
-        }
-
-        .popup-btn.error:hover {
-            background: #c9302c;
-        }
-
-        .popup-btn.success {
-            background: #5cb85c;
-        }
-
-        .popup-btn.success:hover {
-            background: #449d44;
-        }
-
-        @keyframes popupIn {
-            from { 
-                transform: scale(0.7); 
-                opacity: 0; 
-            }
-            to { 
-                transform: scale(1); 
-                opacity: 1; 
-            }
-        }
-    `;
-
-    document.head.appendChild(style);
-    document.body.appendChild(popup);
-}
-
-function closeCustomAlert() {
-    const popup = document.getElementById('custom-alert');
-    if (popup) {
-        popup.remove();
-    }
-}
-
-// ==========================================================================
-// FUNÇÃO PARA VALIDAR FORMULÁRIO
+// FUNÇÃO PARA VALIDAR FORMULÁRIO COM SWEETALERT2
 // ==========================================================================
 function validarFormulario() {
     const employeeId = document.getElementById('employee-select').value;
@@ -349,40 +171,82 @@ function validarFormulario() {
 
     // Validar funcionário selecionado
     if (!employeeId || employeeId === '') {
-        showCustomAlert('Por favor, selecione um funcionário.', 'error');
+        Swal.fire({
+            icon: 'warning',
+            title: 'Campo Obrigatório',
+            text: 'Por favor, selecione um funcionário.',
+            confirmButtonColor: '#ffc107',
+            background: '#2c3e50',
+            color: '#ecf0f1'
+        });
         return false;
     }
 
     // Validar data inicial
     if (!startDate) {
-        showCustomAlert('Por favor, selecione a data inicial.', 'error');
+        Swal.fire({
+            icon: 'warning',
+            title: 'Campo Obrigatório',
+            text: 'Por favor, preencha a data inicial.',
+            confirmButtonColor: '#ffc107',
+            background: '#2c3e50',
+            color: '#ecf0f1'
+        });
         return false;
     }
 
     // Validar data final
     if (!endDate) {
-        showCustomAlert('Por favor, selecione a data final.', 'error');
+        Swal.fire({
+            icon: 'warning',
+            title: 'Campo Obrigatório',
+            text: 'Por favor, preencha a data final.',
+            confirmButtonColor: '#ffc107',
+            background: '#2c3e50',
+            color: '#ecf0f1'
+        });
         return false;
     }
 
     // Validar se data final não é menor que inicial
     const dataInicial = new Date(startDate);
     const dataFinal = new Date(endDate);
-    
+
     if (dataFinal < dataInicial) {
-        showCustomAlert('A data final não pode ser menor que a data inicial.', 'error');
+        Swal.fire({
+            icon: 'warning',
+            title: 'Data Inválida',
+            text: 'A data final não pode ser menor que a data inicial.',
+            confirmButtonColor: '#ffc107',
+            background: '#2c3e50',
+            color: '#ecf0f1'
+        });
         return false;
     }
 
     // Validar arquivo CSV
     if (!csvFile) {
-        showCustomAlert('Por favor, selecione um arquivo CSV.', 'error');
+        Swal.fire({
+            icon: 'warning',
+            title: 'Campo Obrigatório',
+            text: 'Por favor, selecione um arquivo CSV.',
+            confirmButtonColor: '#ffc107',
+            background: '#2c3e50',
+            color: '#ecf0f1'
+        });
         return false;
     }
 
     // Verificar se é realmente um arquivo CSV
     if (!csvFile.name.toLowerCase().endsWith('.csv')) {
-        showCustomAlert('Por favor, selecione um arquivo CSV válido.', 'error');
+        Swal.fire({
+            icon: 'warning',
+            title: 'Arquivo Inválido',
+            text: 'Por favor, selecione um arquivo CSV válido.',
+            confirmButtonColor: '#ffc107',
+            background: '#2c3e50',
+            color: '#ecf0f1'
+        });
         return false;
     }
 
@@ -400,8 +264,19 @@ async function processarCSVeGerarPlanilha() {
         return;
     }
 
-    // Mostrar loading
-    showCustomAlert('Processando dados, aguarde...', 'warning');
+    // Mostrar loading com SweetAlert2
+    Swal.fire({
+        title: 'Processando dados...',
+        text: 'Aguarde enquanto analisamos o CSV.',
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        showConfirmButton: false,
+        didOpen: () => {
+            Swal.showLoading();
+        },
+        background: '#2c3e50',
+        color: '#ecf0f1'
+    });
 
     try {
         // Coletar dados do modal
@@ -414,43 +289,253 @@ async function processarCSVeGerarPlanilha() {
         formData.append('start_date', document.getElementById('start-date').value);
         formData.append('end_date', document.getElementById('end-date').value);
 
-        console.log('Enviando dados para o servidor...');
+        console.log('Enviando CSV para análise...');
 
-        // Enviar para Python
-        const response = await fetch('http://127.0.0.1:5000/gerar-planilha', {
+        // Primeiro, enviar CSV para análise de dias incompletos
+        const response = await fetch('http://127.0.0.1:5000/funcionarios/processar-csv', {
             method: 'POST',
             body: formData
         });
 
-        // Fechar popup de loading
-        closeCustomAlert();
-
-        if (response.ok) {
-            const blob = await response.blob();
-            
-            // Download automático
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'relatorio-ponto.xlsx';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            window.URL.revokeObjectURL(url);
-            
-            // Sucesso
-            showCustomAlert('Planilha gerada com sucesso!', 'success');
-            closeImportCsvModal();
-            
-        } else {
+        if (!response.ok) {
             const errorText = await response.text();
-            showCustomAlert(`Erro no servidor: ${errorText}`, 'error');
+            throw new Error(`Erro no servidor: ${errorText}`);
         }
 
+        const result = await response.json();
+        const diasIncompletos = result.dias_incompletos || [];
+        const totalDiasIncompletos = result.total_dias_incompletos || 0;
+
+        console.log(`Encontrados ${totalDiasIncompletos} dias com pontos incompletos`);
+
+        // Se não há dias incompletos, gerar planilha diretamente
+        if (totalDiasIncompletos === 0) {
+            await gerarPlanilhaFinal({});
+            return;
+        }
+
+        // Processar justificativas para cada dia incompleto
+        const justificativas = {};
+
+        for (let i = 0; i < diasIncompletos.length; i++) {
+            const dia = diasIncompletos[i];
+            const justificativa = await solicitarJustificativa(dia.data, i + 1, totalDiasIncompletos, dia.motivo);
+
+            if (justificativa === null) {
+                // Usuário cancelou
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Processo Cancelado',
+                    text: 'O processamento foi cancelado pelo usuário.',
+                    confirmButtonColor: '#6c757d',
+                    background: '#2c3e50',
+                    color: '#ecf0f1'
+                });
+                return;
+            }
+
+            justificativas[dia.data_iso] = justificativa;
+        }
+
+        // Gerar planilha final com justificativas
+        await gerarPlanilhaFinal(justificativas);
+
     } catch (error) {
-        closeCustomAlert();
         console.error('Erro:', error);
-        showCustomAlert(`Erro ao processar: ${error.message}`, 'error');
+        Swal.fire({
+            icon: 'error',
+            title: 'Erro de Processamento',
+            text: `Erro ao processar: ${error.message}`,
+            confirmButtonColor: '#dc3545',
+            background: '#2c3e50',
+            color: '#ecf0f1'
+        });
+    }
+}
+
+// ==========================================================================
+// FUNÇÃO PARA SOLICITAR JUSTIFICATIVA
+// ==========================================================================
+async function solicitarJustificativa(data, index, total, motivo) {
+    let titulo = `Dia ${data}`;
+    let descricao = '';
+
+    if (motivo === 'dia_ausente') {
+        titulo = `Dia ${data} sem ponto registrado`;
+        descricao = 'Este dia não possui nenhum registro de ponto no CSV.';
+    } else if (motivo.startsWith('ponto_incompleto_')) {
+        const pontosVazios = motivo.split('_')[2];
+        titulo = `Dia ${data} com ponto incompleto`;
+        descricao = `Este dia possui ${pontosVazios} ponto(s) não registrado(s) no CSV.`;
+    }
+
+    return new Promise((resolve) => {
+        Swal.fire({
+            title: titulo,
+            html: `
+                <p style="margin-bottom: 10px; color: #ecf0f1; font-size: 14px;">${descricao}</p>
+                <p style="margin-bottom: 20px;">Por favor selecione uma justificativa (${index}/${total}):</p>
+                <div style="display: flex; justify-content: center; align-items: center; margin: 20px 0;">
+                    <div style="display: flex; gap: 20px; align-items: center;">
+                        <div style="display: flex; align-items: center;">
+                            <input type="radio" id="feriado" name="justificativa" value="FERIADO" style="margin-right: 8px;">
+                            <label for="feriado" style="cursor: pointer; margin: 0;">🏖️ Feriado</label>
+                        </div>
+                        <div style="display: flex; align-items: center;">
+                            <input type="radio" id="folga" name="justificativa" value="FOLGA" style="margin-right: 8px;">
+                            <label for="folga" style="cursor: pointer; margin: 0;">🛌 Folga</label>
+                        </div>
+                        <div style="display: flex; align-items: center;">
+                            <input type="radio" id="atestado" name="justificativa" value="ATESTADO" style="margin-right: 8px;">
+                            <label for="atestado" style="cursor: pointer; margin: 0;">🏥 Atestado</label>
+                        </div>
+                    </div>
+                </div>
+            `,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Salvar',
+            cancelButtonText: 'Cancelar',
+            confirmButtonColor: '#28a745',
+            cancelButtonColor: '#6c757d',
+            background: '#2c3e50',
+            color: '#ecf0f1',
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            preConfirm: () => {
+                const selected = document.querySelector('input[name="justificativa"]:checked');
+                if (!selected) {
+                    Swal.showValidationMessage('Você deve selecionar uma justificativa!');
+                    return false;
+                }
+                return selected.value;
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                resolve(result.value);
+            } else {
+                resolve(null); // Cancelado
+            }
+        });
+    });
+}
+
+// ==========================================================================
+// FUNÇÃO PARA GERAR PLANILHA EXCEL FINAL
+// ==========================================================================
+async function gerarPlanilhaFinal(justificativas) {
+    try {
+        console.log('🔍 DEBUG: Iniciando geração de planilha...');
+        console.log('📝 DEBUG: Justificativas recebidas:', justificativas);
+
+        // Mostrar loading
+        Swal.fire({
+            title: 'Gerando planilha Excel...',
+            text: 'Aguarde enquanto geramos o arquivo formatado com base no CSV original.',
+            allowOutsideClick: false,
+            allowEscapeKey: false,
+            showConfirmButton: false,
+            didOpen: () => {
+                Swal.showLoading();
+            },
+            background: '#2c3e50',
+            color: '#ecf0f1'
+        });
+
+        // Ler conteúdo do arquivo CSV original
+        const csvFile = document.getElementById('csv_file').files[0];
+        console.log('📄 DEBUG: Arquivo CSV:', csvFile);
+
+        const csvContent = await csvFile.text();
+        console.log('📄 DEBUG: Conteúdo CSV (primeiros 200 chars):', csvContent.substring(0, 200));
+
+        // Coletar informações do funcionário
+        const employeeName = document.getElementById('employee-name').value;
+        const employeeCpf = document.getElementById('employee-cpf').value;
+        const startDate = document.getElementById('start-date').value;
+        const endDate = document.getElementById('end-date').value;
+
+        console.log('👤 DEBUG: Dados do funcionário:', {
+            employeeName,
+            employeeCpf,
+            startDate,
+            endDate
+        });
+
+        // Preparar dados para envio
+        const requestData = {
+            csv_content: csvContent,
+            justificativas: justificativas,
+            employee_name: employeeName,
+            employee_cpf: employeeCpf,
+            start_date: startDate,
+            end_date: endDate
+        };
+
+        console.log('📤 DEBUG: Dados para envio:', requestData);
+
+        // Enviar para gerar planilha Excel final
+        console.log('🔄 DEBUG: Enviando requisição...');
+        const response = await fetch('http://127.0.0.1:5000/funcionarios/gerar-planilha-final', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(requestData)
+        });
+
+        console.log('📡 DEBUG: Status da resposta:', response.status);
+        console.log('📡 DEBUG: Headers da resposta:', Object.fromEntries(response.headers.entries()));
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('❌ DEBUG: Erro na resposta:', errorText);
+            throw new Error(`Erro ao gerar planilha: ${errorText}`);
+        }
+
+        // Download automático
+        console.log('📥 DEBUG: Iniciando download...');
+        const blob = await response.blob();
+        console.log('📦 DEBUG: Blob criado, tamanho:', blob.size, 'bytes');
+        console.log('📦 DEBUG: Tipo do blob:', blob.type);
+
+        const url = window.URL.createObjectURL(blob);
+        console.log('🔗 DEBUG: URL criada:', url);
+
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `relatorio_completo_${new Date().toISOString().slice(0, 10)}.xlsx`;
+        console.log('📁 DEBUG: Nome do arquivo:', a.download);
+
+        document.body.appendChild(a);
+        console.log('🖱️ DEBUG: Clicando no link...');
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+        console.log('✅ DEBUG: Download concluído!');
+
+        // Sucesso
+        Swal.fire({
+            icon: 'success',
+            title: 'Planilha gerada com sucesso!',
+            text: 'A planilha Excel foi criada com base no CSV original e baixada automaticamente.',
+            confirmButtonColor: '#28a745',
+            background: '#2c3e50',
+            color: '#ecf0f1'
+        });
+
+        closeImportCsvModal();
+
+    } catch (error) {
+        console.error('❌ DEBUG: Erro ao gerar planilha final:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Erro ao Gerar Planilha',
+            text: `Erro: ${error.message}`,
+            confirmButtonColor: '#dc3545',
+            background: '#2c3e50',
+            color: '#ecf0f1'
+        });
     }
 }
 
