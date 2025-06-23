@@ -74,8 +74,6 @@ O Counting Hours tem como objetivo simplificar a contabilização das horas trab
 | **Objetivos**              | Melhorar a precisão e o controle do ponto eletrônico, reduzir erros manuais e gerar relatórios detalhados para tomadas de decisão mais rápidas.|
 | **Soluções Esperadas**     | Um sistema que calcule automaticamente as horas trabalhadas, visualize colaboradores que merecem bonificações, e permita exportar dados para reuniões e feedbacks. |
 
-[🔝](#top)
-
 ---
 
 ## Funcionalidades Atuais
@@ -83,9 +81,6 @@ O Counting Hours tem como objetivo simplificar a contabilização das horas trab
 - **Cadastro de Funcionários:** Permite adicionar informações básicas dos funcionários, como nome, CPF e carga horária.
 - **Gerenciamento da Carga Horária:** Define a carga horária padrão de cada funcionário, essencial para a contabilização de horas.
 - **Interface de Usuário Intuitiva:** Uma interface web simples e fácil de usar para gerenciar os funcionários.
-
-[🔝](#top)
-
 ---
 
 ## Tecnologias Utilizadas
@@ -93,17 +88,11 @@ O Counting Hours tem como objetivo simplificar a contabilização das horas trab
 - **Frontend:** HTML, CSS e JavaScript
 - **Backend:** Python, Flask
 - **Banco de Dados:** SQLite
-
-[🔝](#top)
-
 ---
 
-## Pré-requisitos
+## Pré-requisitos (Execução do ambiente desenvolvido)
 
 Certifique-se de ter o **Python 3.13** instalado em seu sistema. As dependências do backend serão instaladas utilizando o `pip`.
-
-[🔝](#top)
-
 ---
 
 ## Configuração e Execução
@@ -186,9 +175,6 @@ python main.py
 **Porta já em uso:**
 - Altere a porta no arquivo `main.py` linha 14: `app.run(debug=True, host='127.0.0.1', port=5001)`
 - Atualize as URLs no frontend se necessário
-
-[🔝](#top)
-
 ---
 
 ## Estrutura do Projeto
@@ -252,19 +238,12 @@ C:.
 └───README.md
 ```
 
-[🔝](#top)
-
----
-
 ## Próximos Passos
 
 - Adicionar um novo banco de dados para armazenar as horas dos funcionários e gerar relatórios precisos de horas trabalhadas e saldos de horas por período.
 - Implementar um dashboard para visualizar colaboradores com mais horas em débito e mais horas extras.
 
-[🔝](#top)
-
 ---
-
 ## Licença
 
 Este projeto está sob a licença MIT. Consulte o arquivo `LICENSE` para obter mais detalhes.
